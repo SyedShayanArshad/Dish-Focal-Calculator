@@ -1,101 +1,103 @@
-import Image from "next/image";
+"use client"
+import { useState } from 'react';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [diameter, setDiameter] = useState('');
+  const [depth, setDepth] = useState('');
+  const [focalPoint, setFocalPoint] = useState(null);
+  const [armLength, setArmLength] = useState(null);
+  const [error, setError] = useState(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+  const calculateFocalPointAndArmLength = () => {
+    setError(null);
+    setFocalPoint(null);
+    setArmLength(null);
+
+    if (!diameter && !depth) {
+      setError('Both diameter and depth are required.');
+      return;
+    }
+    else if (!diameter) {
+      setError('Diameter is required.');
+      return;
+    }
+    else if (!depth) {
+      setError('Depth is required.');
+      return;
+    }
+
+    const d = parseFloat(diameter);
+    const h = parseFloat(depth);
+
+    if (isNaN(d) || isNaN(h) || d <= 0 || h <= 0) {
+      setError('Please enter valid positive numbers for diameter and depth.');
+      return;
+    }
+
+    // Calculate focal point
+    const focal = (d * d) / (16 * h);
+    setFocalPoint(focal.toFixed(2));
+
+    // Calculate arm length (radius of the dish)
+    const radius = d / 2;
+    setArmLength(radius.toFixed(2));
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center p-4">
+      <h1 className="text-4xl font-bold mb-6 text-center">Dish LNB Focal Point & Arm Length Calculator</h1>
+      <div className="bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full">
+        {error && (
+          <div className="mb-4 p-3 bg-red-600 text-white rounded-md text-center">
+            {error}
+          </div>
+        )}
+
+        <label htmlFor="diameter" className="block mb-2 font-medium">
+          Diameter (D):
+        </label>
+        <input
+          id="diameter"
+          type="number"
+          placeholder="Enter diameter in inches"
+          value={diameter}
+          onChange={(e) => setDiameter(e.target.value)}
+          className="w-full p-2 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+        />
+
+        <label htmlFor="depth" className="block mb-2 font-medium">
+          Depth (H):
+        </label>
+        <input
+          id="depth"
+          type="number"
+          placeholder="Enter depth in inches"
+          value={depth}
+          onChange={(e) => setDepth(e.target.value)}
+          className="w-full p-2 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+        />
+
+        <button
+          onClick={calculateFocalPointAndArmLength}
+          className="w-full bg-blue-600 hover:bg-blue-700 p-2 rounded-md font-bold text-white transition duration-200"
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          Calculate Focal Point and Arm Length
+        </button>
+
+        {focalPoint && (
+          <div className="mt-4 p-3 font-bold bg-green-600 rounded-md text-center">
+            Focal Point: {focalPoint} inches
+          </div>
+        )}
+
+        {armLength && (
+          <div className="mt-4 p-3 font-bold bg-yellow-600 rounded-md text-center">
+            Arm Length (approx): {armLength} inches
+          </div>
+        )}
+      </div>
+      <h1 className="text-2xl font-bold mt-6 text-center">Designed and Developed by <span className='text-yellow-200'>Bukhari Cable Network</span></h1>
+      <h1 className="text-lg text-yellow-400 font-bold text-center">Arshad Bukhari (0301-8430966)</h1>
     </div>
   );
 }
