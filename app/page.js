@@ -39,7 +39,7 @@ export default function Home() {
     setFocalPoint(focal.toFixed(2));
 
     // Calculate arm length (radius of the dish)
-    const radius = d / 2;
+    const radius = (d / 2)-1.5;
     setArmLength(radius.toFixed(2));
   };
 
